@@ -12,9 +12,6 @@ import jp.yama07.qiitaviewer.vo.Article
 class ArticleAdapter(
   val callback: ArticleItemClickCallback
 ) : RecyclerView.Adapter<ArticleAdapter.ArticleViewHolder>() {
-  init {
-    setHasStableIds(true)
-  }
 
   var articleList: List<Article> = emptyList()
     set(value) {
