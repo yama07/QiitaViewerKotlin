@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+                name="viewModel"
+                type="jp.yama07.qiitaviewer.viewmodel.BrowseArticleViewModel"/>
+
+        <variable
+                name="progressAdapter"
+                type="jp.yama07.qiitaviewer.ui.WebViewProgressAdapter"/>
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <include
+                layout="@layout/article_item"
+                app:article="@{viewModel.article}"/>
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            <WebView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:progressAdapter="@{progressAdapter}"
+                    app:loadUrl="@{viewModel.url}"/>
+
+            <ProgressBar
+                    style="@android:style/Widget.Material.ProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="@{safeUnbox(progressAdapter.loadProgress)}"
+                    app:visibleGone="@{safeUnbox(progressAdapter.isLoading)}"/>
+
+        </FrameLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</layout>

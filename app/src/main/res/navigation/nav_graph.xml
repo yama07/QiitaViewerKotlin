@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/nav_graph"
+            app:startDestination="@id/searchArticleFragment">
+
+    <fragment
+            android:id="@+id/searchArticleFragment"
+            android:name="jp.yama07.qiitaviewer.ui.SearchArticleFragment"
+            android:label="SearchArticleFragment">
+        <action
+                android:id="@+id/action_searchArticleFragment_to_browseArticleFragment"
+                app:destination="@id/browseArticleFragment"/>
+    </fragment>
+    <fragment
+            android:id="@+id/browseArticleFragment"
+            android:name="jp.yama07.qiitaviewer.ui.BrowseArticleFragment"
+            android:label="BrowseArticleFragment">
+        <argument
+                android:name="article"
+                app:argType="jp.yama07.qiitaviewer.vo.Article"/>
+    </fragment>
+</navigation>
