@@ -1,5 +1,6 @@
 package jp.yama07.qiitaviewer.di
 
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import jp.yama07.qiitaviewer.AppJsonAdapterFactory
 import jp.yama07.qiitaviewer.api.QiitaService
@@ -20,6 +21,7 @@ val qiitaServiceModule = module {
             .build()
         )
       )
+      .addCallAdapterFactory(CoroutineCallAdapterFactory())
       .build()
       .create(QiitaService::class.java)
   }

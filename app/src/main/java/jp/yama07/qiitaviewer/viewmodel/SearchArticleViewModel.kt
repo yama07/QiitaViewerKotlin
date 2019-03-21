@@ -1,43 +1,57 @@
 package jp.yama07.qiitaviewer.viewmodel
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.yama07.qiitaviewer.repository.ArticleRepository
 import jp.yama07.qiitaviewer.vo.Article
-import jp.yama07.qiitaviewer.vo.Resource
+import jp.yama07.qiitaviewer.vo.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 class SearchArticleViewModel(
   private val articleRepository: ArticleRepository
-) : ViewModel() {
-  val articles = MediatorLiveData<List<Article>>()
-  val isLoading = MutableLiveData<Boolean>()//.also { it.value = false }
-  val errorMessage = MutableLiveData<String>()
+) : ViewModel(), CoroutineScope {
+
+  private val job = Job()
+  override val coroutineContext: CoroutineContext = Dispatchers.Main + job
+
+  val articles = MutableLiveData<List<Article>>()
+  val isLoading = MutableLiveData<Boolean>()
   val occurredException = MutableLiveData<Throwable>()
 
   fun searchArticles(query: String) {
-    val result = articleRepository.searchArticles(query)
-    articles.addSource(result) {
-      when (it) {
-        is Resource.Loading -> {
-          isLoading.postValue(true)
+    empty()
+    launch(Dispatchers.IO) {
+      isLoading.postValue(true)
+      val response = articleRepository.searchArticles(query)
+      isLoading.postValue(false)
+      when (response) {
+        is Response.Success -> {
+          val data = response.data
+          data.forEach { Timber.d("article: $it") }
+          articles.postValue(data)
         }
-        is Resource.Completed<*> -> {
-          isLoading.postValue(false)
-          val data = it.data
-          when (data) {
-            is String -> {
-              errorMessage.postValue(data)
-            }
-            is Throwable -> {
-              occurredException.postValue(data)
-            }
-            is List<*> -> {
-              articles.postValue(data as List<Article>)
-            }
-          }
+        is Response.Error -> {
+          val err = response.throwable
+          Timber.e(err)
+          occurredException.postValue(err)
         }
       }
     }
+  }
+
+  private fun empty() {
+    isLoading.postValue(false)
+    articles.postValue(null)
+    occurredException.postValue(null)
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    job.cancel()
   }
 }

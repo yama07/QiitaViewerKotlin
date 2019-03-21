@@ -7,17 +7,17 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
 import jp.yama07.qiitaviewer.R
 import jp.yama07.qiitaviewer.databinding.SearchArticleFragmentBinding
 import jp.yama07.qiitaviewer.ext.hideKeyboard
+import jp.yama07.qiitaviewer.ext.observeNonNull
+import jp.yama07.qiitaviewer.ext.observeOrNull
 import jp.yama07.qiitaviewer.ext.showSnackbar
 import jp.yama07.qiitaviewer.viewmodel.SearchArticleViewModel
 import jp.yama07.qiitaviewer.vo.Article
 import org.koin.android.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class SearchArticleFragment : Fragment() {
   private val vm: SearchArticleViewModel by viewModel()
@@ -55,26 +55,19 @@ class SearchArticleFragment : Fragment() {
         override fun onQueryTextChange(query: String): Boolean = false
       }
     }
-
     subscribe()
-
     return binding.root
   }
 
   private fun subscribe() {
-    vm.articles.observe(this, Observer { articles ->
-      articles.forEach { Timber.d("article: $it") }
-      articleAdapter.articleList = articles
-
-      if (articles.isEmpty()) {
+    vm.articles.observeOrNull(this) { articles ->
+      articleAdapter.articleList = articles ?: emptyList()
+      if (articles?.isEmpty() == true) {
         binding.root.showSnackbar("Not Found.", Snackbar.LENGTH_LONG)
       }
-    })
-    vm.errorMessage.observe(this, Observer { msg ->
-      binding.root.showSnackbar("An error occurred: $msg", Snackbar.LENGTH_LONG)
-    })
-    vm.occurredException.observe(this, Observer { t ->
+    }
+    vm.occurredException.observeNonNull(this) { t ->
       binding.root.showSnackbar("An error occurred: ${t.message}", Snackbar.LENGTH_LONG)
-    })
+    }
   }
 }

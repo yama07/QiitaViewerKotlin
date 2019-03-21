@@ -7,6 +7,7 @@ import jp.yama07.qiitaviewer.di.viewModelModule
 import org.koin.android.ext.android.startKoin
 import timber.log.Timber
 
+@Suppress("unused")
 class QiitaViewerApp : Application() {
   override fun onCreate() {
     super.onCreate()
