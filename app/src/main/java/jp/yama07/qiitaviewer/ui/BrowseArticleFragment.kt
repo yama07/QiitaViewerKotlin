@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import jp.yama07.qiitaviewer.R
 import jp.yama07.qiitaviewer.databinding.BrowseArticleFragmentBinding
 import jp.yama07.qiitaviewer.viewmodel.BrowseArticleViewModel
@@ -13,10 +14,8 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class BrowseArticleFragment : Fragment() {
-
-  private val vm: BrowseArticleViewModel by viewModel {
-    parametersOf(BrowseArticleFragmentArgs.fromBundle(arguments!!).article)
-  }
+  private val args: BrowseArticleFragmentArgs by navArgs()
+  private val vm: BrowseArticleViewModel by viewModel { parametersOf(args.article) }
   private lateinit var binding: BrowseArticleFragmentBinding
 
   override fun onCreateView(
