@@ -14,6 +14,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class BrowseArticleFragment : Fragment() {
+
   private val args: BrowseArticleFragmentArgs by navArgs()
   private val vm: BrowseArticleViewModel by viewModel { parametersOf(args.article) }
   private lateinit var binding: BrowseArticleFragmentBinding

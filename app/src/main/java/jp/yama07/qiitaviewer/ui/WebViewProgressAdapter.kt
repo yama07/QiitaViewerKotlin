@@ -8,6 +8,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 
 class WebViewProgressAdapter() {
+
   val loadProgress = MediatorLiveData<Int>().also { it.value = 0 }
   val isLoading = MutableLiveData<Boolean>().also { it.value = false }
 

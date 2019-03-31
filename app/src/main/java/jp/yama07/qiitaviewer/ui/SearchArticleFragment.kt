@@ -13,13 +13,13 @@ import jp.yama07.qiitaviewer.R
 import jp.yama07.qiitaviewer.databinding.SearchArticleFragmentBinding
 import jp.yama07.qiitaviewer.ext.hideKeyboard
 import jp.yama07.qiitaviewer.ext.observeNonNull
-import jp.yama07.qiitaviewer.ext.observeOrNull
 import jp.yama07.qiitaviewer.ext.showSnackbar
 import jp.yama07.qiitaviewer.viewmodel.SearchArticleViewModel
 import jp.yama07.qiitaviewer.vo.Article
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SearchArticleFragment : Fragment() {
+
   private val vm: SearchArticleViewModel by viewModel()
   private lateinit var binding: SearchArticleFragmentBinding
   private lateinit var articleAdapter: ArticleAdapter
@@ -48,7 +48,7 @@ class SearchArticleFragment : Fragment() {
       it.onQueryTextListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String): Boolean {
           binding.root.hideKeyboard()
-          vm.searchArticles(query)
+          vm.query.value = query
           return true
         }
 
@@ -60,9 +60,9 @@ class SearchArticleFragment : Fragment() {
   }
 
   private fun subscribe() {
-    vm.articles.observeOrNull(this) { articles ->
-      articleAdapter.articleList = articles ?: emptyList()
-      if (articles?.isEmpty() == true) {
+    vm.articles.observeNonNull(this) { articles ->
+      articleAdapter.submitList(articles)
+      if (articles.isEmpty() && vm.isLoading.value == false) {
         binding.root.showSnackbar("Not Found.", Snackbar.LENGTH_LONG)
       }
     }
