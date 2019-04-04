@@ -10,18 +10,16 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class ArticleDataSource(
-  val query: String,
+  private val query: String,
   private val qiitaService: QiitaService,
   private val coroutineContext: CoroutineContext
 ) : PageKeyedDataSource<Int, Article>() {
 
-  val isLoading: LiveData<Boolean>
-    get() = _isLoading
-  private val _isLoading = MutableLiveData<Boolean>()
+  private val _isLoading = MutableLiveData<Boolean>().also { it.postValue(false) }
+  val isLoading: LiveData<Boolean> = _isLoading
 
-  val occurredException: LiveData<Throwable>
-    get() = _occurredException
   private val _occurredException = MutableLiveData<Throwable>()
+  val occurredException: LiveData<Throwable> = _occurredException
 
   override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, Article>) {
     CoroutineScope(coroutineContext).launch {
@@ -74,9 +72,8 @@ class ArticleDataSource(
     private val coroutineContext: CoroutineContext
   ) : DataSource.Factory<Int, Article>() {
 
-    val sourceLiveData: LiveData<ArticleDataSource>
-      get() = _sourceLiveData
     private val _sourceLiveData = MutableLiveData<ArticleDataSource>()
+    val sourceLiveData: LiveData<ArticleDataSource> = _sourceLiveData
 
     override fun create(): DataSource<Int, Article> =
       ArticleDataSource(query, qiitaService, coroutineContext).also {

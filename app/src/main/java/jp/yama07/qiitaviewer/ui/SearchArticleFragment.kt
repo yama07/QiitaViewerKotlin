@@ -62,12 +62,14 @@ class SearchArticleFragment : Fragment() {
   private fun subscribe() {
     vm.articles.observeNonNull(this) { articles ->
       articleAdapter.submitList(articles)
-      if (articles.isEmpty() && vm.isLoading.value == false) {
-        binding.root.showSnackbar("Not Found.", Snackbar.LENGTH_LONG)
-      }
     }
     vm.occurredException.observeNonNull(this) { t ->
       binding.root.showSnackbar("An error occurred: ${t.message}", Snackbar.LENGTH_LONG)
+    }
+    vm.isZeroItemsLoaded.observeNonNull(this) {
+      if (it) {
+        binding.root.showSnackbar("Not Found.", Snackbar.LENGTH_LONG)
+      }
     }
   }
 }

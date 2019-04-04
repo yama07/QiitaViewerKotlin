@@ -27,17 +27,34 @@ class SearchArticleViewModel(
   }
 
   private val job = Job()
-  override val coroutineContext: CoroutineContext = Dispatchers.Main + job
+  override val coroutineContext: CoroutineContext = Dispatchers.IO + job
 
   val query = MutableLiveData<String>()
 
   private val dataSourceFactory: LiveData<ArticleDataSource.Factory> = map(query) {
     articleRepository.searchArticles(it, coroutineContext = coroutineContext)
   }
+
   private val dataSource: LiveData<ArticleDataSource> = switchMap(dataSourceFactory) { it.sourceLiveData }
 
-  val articles: LiveData<PagedList<Article>> = switchMap(dataSourceFactory) { it.toLiveData(PAGED_LIST_CONFIG) }
+  private val _isZeroItemsLoaded = MutableLiveData<Boolean>()
+  val isZeroItemsLoaded: LiveData<Boolean> = _isZeroItemsLoaded
+
+  val articles: LiveData<PagedList<Article>> = switchMap(dataSourceFactory) {
+    _isZeroItemsLoaded.postValue(null)
+    it.toLiveData(
+      PAGED_LIST_CONFIG,
+      boundaryCallback = object : PagedList.BoundaryCallback<Article>() {
+        override fun onZeroItemsLoaded() {
+          super.onZeroItemsLoaded()
+          _isZeroItemsLoaded.postValue(true)
+        }
+      }
+    )
+  }
+
   val isLoading: LiveData<Boolean> = switchMap(dataSource) { it.isLoading }
+
   val occurredException: LiveData<Throwable> = switchMap(dataSource) { it.occurredException }
 
   override fun onCleared() {
